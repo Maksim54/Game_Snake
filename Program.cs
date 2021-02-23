@@ -1,0 +1,79 @@
+﻿using System;
+using System.Threading;
+
+namespace Game_Snakes
+{
+    class Program
+    {
+        public void game_draw()
+        {
+            Console.Clear();
+            Console.Title = "Snake";
+            Console.SetWindowSize(101, 26);
+            HorizontalLine upline = new HorizontalLine(0, 100, 0, '+');
+            HorizontalLine downline = new HorizontalLine(0, 100, 25, '+');
+            VerticalLine leftline = new VerticalLine(1, 25, 0, '+');
+            VerticalLine rightline = new VerticalLine(1, 25, 100, '+');
+            upline.Draw();
+            downline.Draw();
+            leftline.Draw();
+            rightline.Draw();
+            Parameters settings = new Parameters();
+            //Sounds sound = new Sounds(settings.GetResourceFolder());
+            //sound.Play("stardust.mp3");
+
+            Point p = new Point(4, 5, '*', ConsoleColor.Cyan);
+            Snake snake = new Snake(p, 4, Direction.RIGHT);
+            snake.Draw();
+            FoodCreator foodCreator = new FoodCreator(101, 26, '¤', ConsoleColor.Green);
+            Point food = foodCreator.CreateFood();
+            food.Draw();
+            Score score = new Score(0, 1);//score =0, level=1
+            score.speed = 400;
+            score.ScoreWrite();
+            while (true)
+            {
+                if (snake.Eat(food))
+                {
+                    score.ScoreUp();
+                    score.ScoreWrite();
+                    food = foodCreator.CreateFood();
+                    food.Draw();
+                    //sound.Stop("stardust.mp3");
+                    if (score.ScoreUp())
+                    {
+                        score.speed -= 10;
+                    }
+                }
+                else
+                {
+                    snake.Move();
+                }
+                Thread.Sleep(score.speed);
+                if (Console.KeyAvailable)
+                {
+                    ConsoleKeyInfo key = Console.ReadKey(true);
+                    snake.HandleKey(key.Key);
+                }
+            }
+        }
+
+        static void Main(string[] args)
+        {
+            Start start = new Start();
+            if (start.choice() == 1)
+            {
+                Program prog = new Program();
+                prog.game_draw();
+            }
+            else
+            {
+                start.Game_stop();
+            }
+
+
+            //Console.ReadLine();
+        }
+    }
+}
+
